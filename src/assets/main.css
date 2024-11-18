@@ -1,5 +1,12 @@
 @import './base.css';
 
+:root {
+  --color-background: #1a1a1a;
+  --color-background-soft: #2f2f2f;
+  --color-text: #ffffff;
+  --vt-c-indigo: #6366f1;
+}
+
 #app {
   margin: 0 auto;
   font-weight: normal;
