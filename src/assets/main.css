@@ -7,6 +7,11 @@
   --vt-c-indigo: #6366f1;
 }
 
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
 #app {
   margin: 0 auto;
   font-weight: normal;
