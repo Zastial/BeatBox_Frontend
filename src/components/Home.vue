@@ -6,6 +6,7 @@ import {
   ArrowDownTrayIcon,
   TrashIcon,
 } from '@heroicons/vue/24/solid'
+import { fetchMusic } from '../utils'
 import beatboxIMG from '@/assets/beatbox.png'
 
 const apiUrl = ref(import.meta.env.VITE_API_URL)
@@ -24,19 +25,9 @@ const currentlyPlayingId = ref<string | null>(null)
 const isLoadingAudio = ref<string | null>(null)
 const audioElement = ref<HTMLAudioElement | null>(null)
 
-const fetchMusic = async () => {
+const fetchMusicAPI = async () => {
   try {
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Timeout')), 10000)
-    })
-
-    const fetchPromise = fetch(import.meta.env.VITE_API_URL + '/music/')
-    const response = await Promise.race([fetchPromise, timeoutPromise])
-
-    if (response instanceof Response) {
-      musicList.value = await response.json()
-    }
-
+    musicList.value = await fetchMusic()
     isLoading.value = false
   } catch (error) {
     console.error('Erreur lors de la récupération des musiques:', error)
@@ -111,7 +102,7 @@ const handleDelete = async (musicId: string) => {
 }
 
 onMounted(() => {
-  fetchMusic()
+  fetchMusicAPI()
 })
 </script>
 
