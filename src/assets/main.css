@@ -1,6 +1,6 @@
 @import './base.css';
 
-:root {
+/* :root {
   --color-background: #1a1a1a;
   --color-background-soft: #2f2f2f;
   --color-text: #ffffff;
@@ -10,7 +10,7 @@
 body {
   background-color: var(--color-background);
   color: var(--color-text);
-}
+} */
 
 #app {
   margin: 0 auto;

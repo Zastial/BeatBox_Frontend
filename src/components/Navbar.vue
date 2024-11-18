@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import beatboxIMG from '@/assets/beatbox.png'
+import { ref } from 'vue'
+
+const isDarkMode = ref(false)
+
+const toggleTheme = () => {
+  isDarkMode.value = !isDarkMode.value
+  document.documentElement.classList.toggle('light-theme')
+}
 </script>
 
 <template>
@@ -15,10 +23,29 @@ import beatboxIMG from '@/assets/beatbox.png'
       <RouterLink to="/" class="nav-link">Home</RouterLink>
       <RouterLink to="/addbeat" class="nav-link">Add a beat</RouterLink>
     </div>
+    <button @click="toggleTheme">
+      {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
+    </button>
   </nav>
 </template>
 
 <style scoped>
+:root {
+  /* Variables pour le mode sombre (par défaut) */
+  --color-background: #1a1a1a;
+  --color-background-soft: #2f2f2f;
+  --color-text: #ffffff;
+  --vt-c-indigo: #6366f1;
+}
+
+:root.light-theme {
+  /* Variables pour le mode clair */
+  --color-background: #ffffff;
+  --color-background-soft: #f9f9f9;
+  --color-text: #213547;
+  --vt-c-indigo: #4f46e5;
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
