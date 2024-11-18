@@ -57,7 +57,7 @@ const handleSubmit = async (event: Event) => {
 
     const response = await axios({
       method: 'post',
-      url: import.meta.env.VITE_API_URL + '/music/',
+      url: `${import.meta.env.VITE_API_URL}/music/`,
       data: formData,
       headers: {
         'Content-Type': 'multipart/form-data',
