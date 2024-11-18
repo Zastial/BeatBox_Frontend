@@ -28,7 +28,7 @@ const fetchMusic = async () => {
       setTimeout(() => reject(new Error('Timeout')), 10000)
     })
 
-    const fetchPromise = fetch('http://127.0.0.1:8000/music/')
+    const fetchPromise = fetch(import.meta.env.VITE_API_URL + '/music/')
     const response = await Promise.race([fetchPromise, timeoutPromise])
 
     if (response instanceof Response) {
@@ -53,7 +53,7 @@ const handlePlay = async (musicId: string) => {
     }
 
     isLoadingAudio.value = musicId
-    const response = await fetch(`http://127.0.0.1:8000/music/${musicId}`)
+    const response = await fetch(import.meta.env.VITE_API_URL + `/music/${musicId}`)
     const audioBlob = await response.blob()
     const audioUrl = URL.createObjectURL(audioBlob)
 
@@ -76,7 +76,7 @@ const handlePlay = async (musicId: string) => {
 }
 
 const handleDownload = async (music: Music) => {
-  const response = await fetch(`http://127.0.0.1:8000/music/${music.id}`)
+  const response = await fetch(import.meta.env.VITE_API_URL + `/music/${music.id}`)
   const audioBlob = await response.blob()
   const audioUrl = URL.createObjectURL(audioBlob)
   const a = document.createElement('a')
@@ -87,7 +87,7 @@ const handleDownload = async (music: Music) => {
 
 const handleDelete = async (musicId: string) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/music/${musicId}`, {
+    const response = await fetch(import.meta.env.VITE_API_URL + `/music/${musicId}`, {
       method: 'DELETE',
     })
 
@@ -135,7 +135,10 @@ onMounted(() => {
       <div v-else class="music-container">
         <div v-for="music in musicList" :key="music.id" class="music-card">
           <div class="music-image">
-            <img :src="`http://127.0.0.1:8000/music/image/${music.img_path}`" alt="Music cover" />
+            <img
+              :src="import.meta.env.VITE_API_URL + '/music/image/' + music.img_path"
+              alt="Music cover"
+            />
           </div>
           <div class="music-title">
             {{ music.title }}
