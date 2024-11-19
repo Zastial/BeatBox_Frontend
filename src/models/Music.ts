@@ -1,6 +1,16 @@
 interface Music {
-    id: string
-    title: string
-    filename: string
-    img_path: string
+  id: string
+  title: string
+  artist: string
+  filename: string
+  img_path: string
+}
+
+
+interface Beat {
+  id: string
+  title: string
+  artist: string
+  filename: string
+  img_path: string
 }

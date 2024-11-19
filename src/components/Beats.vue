@@ -1,77 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import {
-  PlayCircleIcon,
-  PauseCircleIcon,
-  ArrowDownTrayIcon,
-  TrashIcon,
-} from '@heroicons/vue/24/solid'
-import beatboxIMG from '@/assets/beatbox.png'
-import { Music } from '../models/Music'
-import { fetchMusic } from '../utils'
-
-const apiUrl = ref(import.meta.env.VITE_API_URL)
-
-const musicList = ref<Music[]>([])
-const isLoading = ref(true)
-const hasError = ref(false)
-const currentlyPlayingId = ref<string | null>(null)
-const isLoadingAudio = ref<string | null>(null)
-const audioElement = ref<HTMLAudioElement | null>(null)
-
-const fetchMusicAPI = async () => {
-  try {
-    musicList.value = await fetchMusic()
-    isLoading.value = false
-  } catch (error) {
-    console.error('Erreur lors de la récupération des musiques:', error)
-    isLoading.value = false
-    hasError.value = true
-  }
-}
-
-onMounted(() => {
-  fetchMusicAPI()
-})
+import BeatList from './BeatList.vue'
 </script>
 
 <template>
-<div class="musics-container">
-      <div v-if="isLoading" class="loading-container">
-        <div class="loader"></div>
-        <p>Chargement des beats...</p>
-      </div>
-
-      <div v-else-if="hasError" class="error-container">
-        <p>Impossible de récupérer les beats pour l'instant. Merci de réessayer ultérieurement</p>
-      </div>
-
-      <div v-else class="music-container">
-        <div v-for="music in musicList" :key="music.id" class="music-card">
-          <div class="music-image">
-            <img :src="apiUrl + '/music/image/' + music.img_path" alt="Music cover" />
-          </div>
-          <div class="music-title">
-            {{ music.title }}
-          </div>
-          <div class="music-controls">
-            <div v-if="isLoadingAudio === music.id" class="loading-circle"></div>
-            <div v-else class="controls-group">
-              <button @click="handlePlay(music.id)" class="play-button">
-                <PlayCircleIcon v-if="currentlyPlayingId !== music.id" class="control-icon" />
-                <PauseCircleIcon v-else class="control-icon" />
-              </button>
-              <button class="download-button" @click="handleDownload(music)">
-                <ArrowDownTrayIcon class="control-icon download-icon" />
-              </button>
-              <button class="delete-button" @click="handleDelete(music.id)">
-                <TrashIcon class="control-icon delete-icon" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="musics-container">
+    <BeatList />
+  </div>
 </template>
 
 <style scoped>

@@ -13,8 +13,9 @@ import beatboxIMG from '@/assets/beatbox.png'
     </div>
     <div class="nav-links">
       <RouterLink to="/" class="nav-link">Home</RouterLink>
-      <RouterLink to="/addbeat" class="nav-link">Add a beat</RouterLink>
+      <RouterLink to="/addsong" class="nav-link">Add a song</RouterLink>
       <RouterLink to="/beats" class="nav-link">Beats</RouterLink>
+      <RouterLink to="/vocals" class="nav-link">Vocals</RouterLink>
     </div>
   </nav>
 </template>

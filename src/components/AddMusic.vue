@@ -80,7 +80,7 @@ const handleSubmit = async (event: Event) => {
       if (audioInput) audioInput.value = ''
       if (imageInput) imageInput.value = ''
 
-      router.push('/beats')
+      router.back()
     }
   } catch (e) {
     error.value = "Une erreur est survenue lors de l'envoi"
@@ -93,9 +93,11 @@ const handleSubmit = async (event: Event) => {
 
 <template>
   <div class="form-container">
+    <h2>Ajouter un beat</h2>
+
     <form @submit="handleSubmit" class="beat-form">
       <div class="form-group">
-        <label for="title">Title</label>
+        <label for="title">Titre</label>
         <input
           id="title"
           v-model="title"
@@ -112,15 +114,23 @@ const handleSubmit = async (event: Event) => {
           placeholder="Entrez le nom de l'artiste"
           required
         />
+
+        <label for="type">Type</label>
+        <select name="type" id="type">
+          <option value="">--Please choose a type--</option>
+          <option value="song">Song</option>
+          <option value="beat">Beat</option>
+          <option value="vocal">Vocal</option>
+        </select>
       </div>
 
       <div class="form-group">
-        <label for="audio-input">Audio File</label>
+        <label for="audio-input">Fichier audio</label>
         <input id="audio-input" type="file" accept="audio/*" @change="handleAudioChange" required />
       </div>
 
       <div class="form-group">
-        <label for="image-input">Cover</label>
+        <label for="image-input">Image de couverture</label>
         <input id="image-input" type="file" accept="image/*" @change="handleImageChange" required />
       </div>
 
@@ -128,7 +138,10 @@ const handleSubmit = async (event: Event) => {
         {{ error }}
       </div>
 
-      <div v-if="success" class="success-message">Beat saved with success !</div>
+      <div v-if="success" class="success-message">
+        Beat ajouté avec succès !
+        <router-link to="/">Retour à la liste des beats</router-link>
+      </div>
 
       <button type="submit" :disabled="isLoading">
         <span v-if="isLoading" class="loader"></span>

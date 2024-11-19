@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import AddBeat from '../components/AddBeat.vue'
+import Vocals from '../components/Vocals.vue'
 </script>
 
 <template>
   <main>
-    <AddBeat />
+    <Vocals />
   </main>
 </template>

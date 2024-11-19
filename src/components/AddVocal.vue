@@ -1,18 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+
+const props = defineProps<{
+  beats: Beat[]
+}>()
 
 const router = useRouter()
 
 const title = ref('')
 const artist = ref('')
-const type = ref('')
+const selectedBeat = ref('')
+const searchQuery = ref('')
 const audioFile = ref<File | null>(null)
-const imageFile = ref<File | null>(null)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const success = ref(false)
+
+const filteredBeats = computed(() => {
+  return props.beats.filter(
+    (beat) =>
+      beat.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      beat.artist.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
+})
 
 const handleAudioChange = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -21,16 +33,9 @@ const handleAudioChange = (event: Event) => {
   }
 }
 
-const handleImageChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  if (target.files) {
-    imageFile.value = target.files[0]
-  }
-}
-
 const handleSubmit = async (event: Event) => {
   event.preventDefault()
-  if (!title.value || !audioFile.value || !imageFile.value) {
+  if (!title.value || !audioFile.value || !selectedBeat.value) {
     error.value = 'Veuillez remplir tous les champs'
     return
   }
@@ -40,28 +45,15 @@ const handleSubmit = async (event: Event) => {
   success.value = false
 
   try {
-    // Création d'un objet avec les données
-    const data = {
-      title: title.value,
-      artist: artist.value,
-      audio_file: audioFile.value,
-      image_file: imageFile.value,
-    }
-
-    // Création du FormData à partir de l'objet
     const formData = new FormData()
-    Object.entries(data).forEach(([key, value]) => {
-      if (value instanceof File) {
-        formData.append(key, value, value.name)
-      } else {
-        formData.append(key, value)
-      }
-    })
+    formData.append('title', title.value)
+    formData.append('artist', artist.value)
+    formData.append('beat_id', selectedBeat.value)
+    formData.append('audio_file', audioFile.value)
 
-    const route = type.value
     const response = await axios({
       method: 'post',
-      url: `${import.meta.env.VITE_API_URL}/beat/`,
+      url: `${import.meta.env.VITE_API_URL}/vocal/`,
       data: formData,
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -70,17 +62,16 @@ const handleSubmit = async (event: Event) => {
 
     if (response.status === 201 || response.status === 200) {
       success.value = true
-      // Reset du formulaire
       title.value = ''
+      artist.value = ''
+      selectedBeat.value = ''
       audioFile.value = null
-      imageFile.value = null
+      searchQuery.value = ''
 
       const audioInput = document.getElementById('audio-input') as HTMLInputElement
-      const imageInput = document.getElementById('image-input') as HTMLInputElement
       if (audioInput) audioInput.value = ''
-      if (imageInput) imageInput.value = ''
 
-      router.push('/beats')
+      router.push('/vocals')
     }
   } catch (e) {
     error.value = "Une erreur est survenue lors de l'envoi"
@@ -100,7 +91,7 @@ const handleSubmit = async (event: Event) => {
           id="title"
           v-model="title"
           type="text"
-          placeholder="Entrez le titre du beat"
+          placeholder="Entrez le titre du vocal"
           required
         />
 
@@ -112,6 +103,22 @@ const handleSubmit = async (event: Event) => {
           placeholder="Entrez le nom de l'artiste"
           required
         />
+
+        <label for="beat-search">Rechercher un beat</label>
+        <input
+          id="beat-search"
+          v-model="searchQuery"
+          type="text"
+          placeholder="Rechercher par titre ou artiste"
+        />
+
+        <label for="beat-select">Beat</label>
+        <select id="beat-select" v-model="selectedBeat" required>
+          <option value="">Sélectionnez un beat</option>
+          <option v-for="beat in filteredBeats" :key="beat.id" :value="beat.id">
+            {{ beat.title }} - {{ beat.artist }}
+          </option>
+        </select>
       </div>
 
       <div class="form-group">
@@ -119,20 +126,15 @@ const handleSubmit = async (event: Event) => {
         <input id="audio-input" type="file" accept="audio/*" @change="handleAudioChange" required />
       </div>
 
-      <div class="form-group">
-        <label for="image-input">Cover</label>
-        <input id="image-input" type="file" accept="image/*" @change="handleImageChange" required />
-      </div>
-
       <div v-if="error" class="error-message">
         {{ error }}
       </div>
 
-      <div v-if="success" class="success-message">Beat saved with success !</div>
+      <div v-if="success" class="success-message">Vocal saved with success!</div>
 
       <button type="submit" :disabled="isLoading">
         <span v-if="isLoading" class="loader"></span>
-        <span v-else>Ajouter le beat</span>
+        <span v-else>Ajouter le vocal</span>
       </button>
     </form>
   </div>

@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import AddBeatView from '../views/AddBeatView.vue'
+import AddSongView from '../views/AddSongView.vue'
 import BeatsView from '@/views/BeatsView.vue'
 import BeatView from '@/views/BeatView.vue'
+import VocalsView from '@/views/VocalsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,9 +14,9 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/addbeat',
-      name: 'addbeat',
-      component: AddBeatView,
+      path: '/addsong',
+      name: 'addsong',
+      component: AddSongView,
     },
     {
       path: '/beats',
@@ -23,14 +24,19 @@ const router = createRouter({
       component: BeatsView,
     },
     {
-      path: '/beat',
+      path: '/beat/:beat_id',
       name: 'beat',
       component: BeatView,
     },
     {
+      path: '/vocals',
+      name: 'vocals',
+      component: VocalsView,
+    },
+    {
       path: '/:pathMatch(.*)*',
-      redirect: '/'
-    }
+      redirect: '/',
+    },
   ],
 })
 
