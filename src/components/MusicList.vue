@@ -11,10 +11,6 @@ import { useRouter } from 'vue-router'
 
 const apiUrl = ref(import.meta.env.VITE_API_URL)
 
-const props = defineProps<{
-  type: string
-}>()
-
 const musicList = ref<Music[]>([])
 const isLoading = ref(true)
 const hasError = ref(false)
@@ -26,7 +22,7 @@ const router = useRouter()
 
 const fetchMusicsAPI = async () => {
   try {
-    musicList.value = await fetchSongs(props.type)
+    musicList.value = await fetchSongs('music')
     isLoading.value = false
   } catch (error) {
     console.error('Erreur lors de la récupération des musiques:', error)
@@ -45,7 +41,7 @@ const handlePlay = async (musicId: string) => {
     }
 
     isLoadingAudio.value = musicId
-    const response = await fetch(apiUrl.value + `/music/${musicId}`)
+    const response = await fetch(apiUrl.value + `/music/download/${musicId}`)
     const audioBlob = await response.blob()
     const audioUrl = URL.createObjectURL(audioBlob)
 
@@ -100,12 +96,8 @@ const handleDelete = async (musicId: string) => {
   }
 }
 
-const handleClick = (beatId: string) => {
-  if (props.type === 'beat') {
-    router.push(`/beat/${beatId}`)
-  } else {
-    router.push(`/song/${beatId}`)
-  }
+const redirectToAddMusic = () => {
+  router.push({ path: '/addsong', query: { component: 'music' } })
 }
 
 onMounted(() => {
@@ -123,10 +115,15 @@ onMounted(() => {
     <p>Impossible de récupérer les beats pour l'instant. Merci de réessayer ultérieurement</p>
   </div>
 
+  <div v-else-if="musicList.length === 0" class="music-container empty-container">
+    <p>Aucune musique trouvée</p>
+    <button class="add-vocal-button" @click="redirectToAddMusic">Add a music</button>
+  </div>
+
   <div v-else class="music-container">
     <div v-for="music in musicList" :key="music.id" class="music-card">
-      <div class="music-image" @click="handleClick(music.id)">
-        <img :src="apiUrl + '/' + props.type + '/image/' + music.img_path" alt="Music cover" />
+      <div class="music-image">
+        <img :src="apiUrl + '/music/image/' + music.img_path" alt="Music cover" />
       </div>
       <div class="music-title">{{ music.title }} - {{ music.artist }}</div>
       <div class="music-controls">
@@ -149,6 +146,29 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.clickable-area {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  cursor: pointer;
+}
+
+.empty-container {
+  text-align: center;
+  padding: 2rem;
+  color: hsla(160, 100%, 37%, 1);
+  font-size: 1.5rem;
+  font-weight: bold;
+  justify-content: center;
+}
+
+.empty-container button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  width: 25%;
+  margin: 0 auto;
+}
+
 .music-container {
   display: flex;
   flex-direction: column;

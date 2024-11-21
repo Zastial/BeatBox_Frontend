@@ -31,7 +31,7 @@ const handleImageChange = (event: Event) => {
 const handleSubmit = async (event: Event) => {
   event.preventDefault()
   if (!title.value || !audioFile.value || !imageFile.value) {
-    error.value = 'Veuillez remplir tous les champs'
+    error.value = 'Please fill in all fields'
     return
   }
 
@@ -40,7 +40,6 @@ const handleSubmit = async (event: Event) => {
   success.value = false
 
   try {
-    // Création d'un objet avec les données
     const data = {
       title: title.value,
       artist: artist.value,
@@ -48,7 +47,6 @@ const handleSubmit = async (event: Event) => {
       image_file: imageFile.value,
     }
 
-    // Création du FormData à partir de l'objet
     const formData = new FormData()
     Object.entries(data).forEach(([key, value]) => {
       if (value instanceof File) {
@@ -61,7 +59,7 @@ const handleSubmit = async (event: Event) => {
     const route = type.value
     const response = await axios({
       method: 'post',
-      url: `${import.meta.env.VITE_API_URL}/beat/`,
+      url: `${import.meta.env.VITE_API_URL}/music/`,
       data: formData,
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -70,7 +68,6 @@ const handleSubmit = async (event: Event) => {
 
     if (response.status === 201 || response.status === 200) {
       success.value = true
-      // Reset du formulaire
       title.value = ''
       audioFile.value = null
       imageFile.value = null
@@ -80,10 +77,10 @@ const handleSubmit = async (event: Event) => {
       if (audioInput) audioInput.value = ''
       if (imageInput) imageInput.value = ''
 
-      router.back()
+      router.push('/')
     }
   } catch (e) {
-    error.value = "Une erreur est survenue lors de l'envoi"
+    error.value = "An error occured while sending the music"
     console.error(e)
   } finally {
     isLoading.value = false
@@ -93,16 +90,14 @@ const handleSubmit = async (event: Event) => {
 
 <template>
   <div class="form-container">
-    <h2>Ajouter un beat</h2>
-
     <form @submit="handleSubmit" class="beat-form">
       <div class="form-group">
-        <label for="title">Titre</label>
+        <label for="title">Title</label>
         <input
           id="title"
           v-model="title"
           type="text"
-          placeholder="Entrez le titre du beat"
+          placeholder="Enter the title"
           required
         />
 
@@ -111,26 +106,18 @@ const handleSubmit = async (event: Event) => {
           id="artist"
           v-model="artist"
           type="text"
-          placeholder="Entrez le nom de l'artiste"
+          placeholder="Enter the artist name"
           required
         />
-
-        <label for="type">Type</label>
-        <select name="type" id="type">
-          <option value="">--Please choose a type--</option>
-          <option value="song">Song</option>
-          <option value="beat">Beat</option>
-          <option value="vocal">Vocal</option>
-        </select>
       </div>
 
       <div class="form-group">
-        <label for="audio-input">Fichier audio</label>
+        <label for="audio-input">Audio File</label>
         <input id="audio-input" type="file" accept="audio/*" @change="handleAudioChange" required />
       </div>
 
       <div class="form-group">
-        <label for="image-input">Image de couverture</label>
+        <label for="image-input">Cover</label>
         <input id="image-input" type="file" accept="image/*" @change="handleImageChange" required />
       </div>
 
@@ -139,13 +126,13 @@ const handleSubmit = async (event: Event) => {
       </div>
 
       <div v-if="success" class="success-message">
-        Beat ajouté avec succès !
-        <router-link to="/">Retour à la liste des beats</router-link>
+        Music added successfully !
+        <router-link to="/">Back to the list</router-link>
       </div>
 
       <button type="submit" :disabled="isLoading">
         <span v-if="isLoading" class="loader"></span>
-        <span v-else>Ajouter le beat</span>
+        <span v-else>Add Music</span>
       </button>
     </form>
   </div>

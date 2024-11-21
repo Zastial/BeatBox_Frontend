@@ -31,7 +31,7 @@ const handleImageChange = (event: Event) => {
 const handleSubmit = async (event: Event) => {
   event.preventDefault()
   if (!title.value || !audioFile.value || !imageFile.value) {
-    error.value = 'Veuillez remplir tous les champs'
+    error.value = 'Please fill in all fields'
     return
   }
 
@@ -40,7 +40,6 @@ const handleSubmit = async (event: Event) => {
   success.value = false
 
   try {
-    // Création d'un objet avec les données
     const data = {
       title: title.value,
       artist: artist.value,
@@ -48,7 +47,6 @@ const handleSubmit = async (event: Event) => {
       image_file: imageFile.value,
     }
 
-    // Création du FormData à partir de l'objet
     const formData = new FormData()
     Object.entries(data).forEach(([key, value]) => {
       if (value instanceof File) {
@@ -70,7 +68,6 @@ const handleSubmit = async (event: Event) => {
 
     if (response.status === 201 || response.status === 200) {
       success.value = true
-      // Reset du formulaire
       title.value = ''
       audioFile.value = null
       imageFile.value = null
@@ -83,7 +80,7 @@ const handleSubmit = async (event: Event) => {
       router.push('/beats')
     }
   } catch (e) {
-    error.value = "Une erreur est survenue lors de l'envoi"
+    error.value = 'An error occured while sending the beat'
     console.error(e)
   } finally {
     isLoading.value = false
@@ -96,20 +93,14 @@ const handleSubmit = async (event: Event) => {
     <form @submit="handleSubmit" class="beat-form">
       <div class="form-group">
         <label for="title">Title</label>
-        <input
-          id="title"
-          v-model="title"
-          type="text"
-          placeholder="Entrez le titre du beat"
-          required
-        />
+        <input id="title" v-model="title" type="text" placeholder="Enter the title" required />
 
         <label for="artist">Artist</label>
         <input
           id="artist"
           v-model="artist"
           type="text"
-          placeholder="Entrez le nom de l'artiste"
+          placeholder="Enter the artist name"
           required
         />
       </div>
@@ -132,7 +123,7 @@ const handleSubmit = async (event: Event) => {
 
       <button type="submit" :disabled="isLoading">
         <span v-if="isLoading" class="loader"></span>
-        <span v-else>Ajouter le beat</span>
+        <span v-else>Add the beat</span>
       </button>
     </form>
   </div>

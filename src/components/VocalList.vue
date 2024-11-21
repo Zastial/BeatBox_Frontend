@@ -6,23 +6,26 @@ import {
   ArrowDownTrayIcon,
   TrashIcon,
 } from '@heroicons/vue/24/solid'
-import { fetchSongs } from '../utils'
-import { useRouter } from 'vue-router'
+import { fetchVocals } from '../utils'
 
 const apiUrl = ref(import.meta.env.VITE_API_URL)
 
-const musicList = ref<Music[]>([])
+const vocalList = ref<Vocal[]>([])
 const isLoading = ref(true)
 const hasError = ref(false)
 const currentlyPlayingId = ref<string | null>(null)
 const isLoadingAudio = ref<string | null>(null)
 const audioElement = ref<HTMLAudioElement | null>(null)
 
-const router = useRouter()
+const props = defineProps<{
+  beatId: string
+}>()
 
-const fetchBeatsAPI = async () => {
+const fetchvocalsAPI = async () => {
+  if (vocalList.value.length > 0) return
+
   try {
-    musicList.value = await fetchSongs('beat')
+    vocalList.value = await fetchVocals(props.beatId)
     isLoading.value = false
   } catch (error) {
     console.error('Erreur lors de la récupération des musiques:', error)
@@ -31,17 +34,16 @@ const fetchBeatsAPI = async () => {
   }
 }
 
-const handlePlay = async (musicId: string) => {
+const handlePlay = async (vocalId: string) => {
   try {
-    if (currentlyPlayingId.value === musicId) {
-      // Pause the current playing music
+    if (currentlyPlayingId.value === vocalId) {
       audioElement.value?.pause()
       currentlyPlayingId.value = null
       return
     }
 
-    isLoadingAudio.value = musicId
-    const response = await fetch(apiUrl.value + `/beat/${musicId}`)
+    isLoadingAudio.value = vocalId
+    const response = await fetch(apiUrl.value + `/vocal/download/${vocalId}`)
     const audioBlob = await response.blob()
     const audioUrl = URL.createObjectURL(audioBlob)
 
@@ -51,7 +53,7 @@ const handlePlay = async (musicId: string) => {
 
     audioElement.value = new Audio(audioUrl)
     await audioElement.value.play()
-    currentlyPlayingId.value = musicId
+    currentlyPlayingId.value = vocalId
     isLoadingAudio.value = null
 
     audioElement.value.addEventListener('ended', () => {
@@ -63,28 +65,28 @@ const handlePlay = async (musicId: string) => {
   }
 }
 
-const handleDownload = async (music: Music) => {
-  const response = await fetch(apiUrl.value + `/beat/download/${music.id}`)
+const handleDownload = async (vocal: Vocal) => {
+  const response = await fetch(apiUrl.value + `/vocal/download/${vocal.id}`)
   const audioBlob = await response.blob()
   const audioUrl = URL.createObjectURL(audioBlob)
   const a = document.createElement('a')
   a.href = audioUrl
-  a.download = music.title
+  a.download = vocal.title
   a.click()
 }
 
-const handleDelete = async (musicId: string) => {
+const handleDelete = async (vocalId: string) => {
   try {
-    const response = await fetch(apiUrl.value + `/beat/${musicId}`, {
+    const response = await fetch(apiUrl.value + `/vocal/${vocalId}`, {
       method: 'DELETE',
     })
 
     if (response.ok) {
       // Mettre à jour la liste en filtrant l'élément supprimé
-      musicList.value = musicList.value.filter((music) => music.id !== musicId)
+      vocalList.value = vocalList.value.filter((vocal) => vocal.id !== vocalId)
 
       // Si c'était la musique en cours de lecture, on l'arrête
-      if (currentlyPlayingId.value === musicId) {
+      if (currentlyPlayingId.value === vocalId) {
         audioElement.value?.pause()
         currentlyPlayingId.value = null
       }
@@ -96,53 +98,39 @@ const handleDelete = async (musicId: string) => {
   }
 }
 
-const handleClick = (beatId: string) => {
-  router.push(`/beat/${beatId}`)
-}
-
-const redirectToAddBeat = () => {
-  router.push({ path: '/addsong', query: { component: 'beat' } })
-}
-
 onMounted(() => {
-  fetchBeatsAPI()
+  fetchvocalsAPI()
 })
 </script>
 
 <template>
   <div v-if="isLoading" class="loading-container">
     <div class="loader"></div>
-    <p>Chargement des beats...</p>
+    <p>Chargement des vocals...</p>
   </div>
 
   <div v-else-if="hasError" class="error-container">
-    <p>Impossible de récupérer les beats pour l'instant. Merci de réessayer ultérieurement</p>
+    <p>Impossible de récupérer les vocals pour l'instant. Merci de réessayer ultérieurement</p>
   </div>
 
-  <div v-else-if="musicList.length === 0" class="music-container empty-container">
-    <p>Aucun beat trouvé</p>
-    <button class="add-vocal-button" @click="redirectToAddBeat">Add a beat</button>
+  <div v-else-if="vocalList.length === 0" class="vocal-container empty-container">
+    <p>Aucun vocal trouvé pour ce beat</p>
   </div>
 
-  <div v-else class="music-container">
-    <div v-for="music in musicList" :key="music.id" class="music-card">
-      <div class="clickable-area" @click="handleClick(music.id)">
-        <div class="music-image">
-          <img :src="apiUrl + '/beat/image/' + music.img_path" alt="Music cover" />
-        </div>
-        <div class="music-title">{{ music.title }} - {{ music.artist }}</div>
-      </div>
-      <div class="music-controls">
-        <div v-if="isLoadingAudio === music.id" class="loading-circle"></div>
+  <div v-else class="vocal-container">
+    <div v-for="vocal in vocalList" :key="vocal.id" class="vocal-card">
+      <div class="vocal-title">{{ vocal.title }} - {{ vocal.artist }}</div>
+      <div class="vocal-controls">
+        <div v-if="isLoadingAudio === vocal.id" class="loading-circle"></div>
         <div v-else class="controls-group">
-          <button @click="handlePlay(music.id)" class="play-button">
-            <PlayCircleIcon v-if="currentlyPlayingId !== music.id" class="control-icon" />
+          <button @click="handlePlay(vocal.id)" class="play-button">
+            <PlayCircleIcon v-if="currentlyPlayingId !== vocal.id" class="control-icon" />
             <PauseCircleIcon v-else class="control-icon" />
           </button>
-          <button class="download-button" @click="handleDownload(music)">
+          <button class="download-button" @click="handleDownload(vocal)">
             <ArrowDownTrayIcon class="control-icon download-icon" />
           </button>
-          <button class="delete-button" @click="handleDelete(music.id)">
+          <button class="delete-button" @click="handleDelete(vocal.id)">
             <TrashIcon class="control-icon delete-icon" />
           </button>
         </div>
@@ -168,45 +156,38 @@ onMounted(() => {
   justify-content: center;
 }
 
-.empty-container button {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  width: 15%;
-  margin: 0 auto;
-}
-
-.music-container {
+.vocal-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
   overflow-y: auto;
-  min-height: 0;
+  min-height: 20rem;
   flex: 1;
   border: 1px solid var(--color-text);
   border-radius: 8px;
 }
 
-.music-container::-webkit-scrollbar {
+.vocal-container::-webkit-scrollbar {
   width: 8px;
 }
 
-.music-container::-webkit-scrollbar-track {
+.vocal-container::-webkit-scrollbar-track {
   background: var(--color-background-soft);
   border-radius: 4px;
 }
 
-.music-container::-webkit-scrollbar-thumb {
+.vocal-container::-webkit-scrollbar-thumb {
   background: var(--color-text);
   opacity: 0.5;
   border-radius: 4px;
 }
 
-.music-container::-webkit-scrollbar-thumb:hover {
+.vocal-container::-webkit-scrollbar-thumb:hover {
   background: var(--vt-c-indigo);
 }
 
-.music-card {
+.vocal-card {
   display: flex;
   align-items: center;
   padding: 1rem;
@@ -215,25 +196,25 @@ onMounted(() => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.music-image {
+.vocal-image {
   width: 60px;
   height: 60px;
   margin-right: 1rem;
 }
 
-.music-image img {
+.vocal-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 4px;
 }
 
-.music-title {
+.vocal-title {
   flex: 1;
   font-size: 1.1rem;
 }
 
-.music-controls {
+.vocal-controls {
   margin-left: 1rem;
 }
 

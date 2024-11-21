@@ -40,3 +40,16 @@ export const fetchSong = async (type: string, musicId: string): Promise<Music> =
   }
   return music.value as Music
 }
+
+export const fetchVocals = async (beatId: string): Promise<Vocal[]> => {
+  const vocals = ref<Vocal[]>([])
+  try {
+    const response = await fetch(apiUrl.value + '/vocal/beat/' + beatId)
+    if (response instanceof Response) {
+      vocals.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Erreur lors de la récupération des vocaux:', error)
+  }
+  return vocals.value
+}

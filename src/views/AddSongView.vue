@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import AddBeat from '../components/AddBeat.vue'
 import AddVocal from '../components/AddVocal.vue'
 import AddMusic from '../components/AddMusic.vue'
 import { fetchSongs } from '../utils'
 
-const selectedComponent = ref<string | null>('beat')
+const route = useRoute()
+const selectedComponent = ref<string | null>(route.query.component?.toString() || 'beat')
+const selectedBeat = ref<string>(route.query.beat_id?.toString() || '')
 const musicList = ref<Beat[]>([])
 const isLoading = ref(true)
 const hasError = ref(false)
-
-const handleTypeChange = (event: Event) => {
-  const target = event.target as HTMLSelectElement
-  selectedComponent.value = target.value
-}
 
 const fetchBeatsAPI = async () => {
   try {
@@ -46,8 +44,8 @@ onMounted(() => {
 
     <div class="form-group">
       <label for="type">Type</label>
-      <select name="type" id="type" @change="handleTypeChange" required>
-        <option value="beat" selected>Beat</option>
+      <select name="type" id="type" v-model="selectedComponent" required>
+        <option value="beat">Beat</option>
         <option value="vocal">Vocal</option>
         <option value="music">Music</option>
       </select>
@@ -65,6 +63,7 @@ onMounted(() => {
               : null
       "
       :beats="musicList"
+      :beat_id="selectedBeat"
     />
   </div>
 </template>
@@ -89,6 +88,27 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+select {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+select:hover {
+  border-color: var(--color-border-hover);
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
 }
 
 .loading-container {

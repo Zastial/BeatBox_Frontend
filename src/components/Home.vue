@@ -13,7 +13,7 @@ import MusicList from './MusicList.vue'
     </div>
 
     <div class="musics-container">
-      <MusicList type="music" />
+      <MusicList />
     </div>
   </div>
 </template>
