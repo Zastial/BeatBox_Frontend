@@ -13,7 +13,8 @@ import beatboxIMG from '@/assets/beatbox.png'
     </div>
     <div class="nav-links">
       <RouterLink to="/" class="nav-link">Home</RouterLink>
-      <RouterLink to="/addbeat" class="nav-link">Add a beat</RouterLink>
+      <RouterLink to="/addsong" class="nav-link">Add a song</RouterLink>
+      <RouterLink to="/beats" class="nav-link">Beats</RouterLink>
     </div>
   </nav>
 </template>
@@ -36,7 +37,6 @@ import beatboxIMG from '@/assets/beatbox.png'
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: var(--color-text);
 }
 
 .logo {
@@ -70,7 +70,7 @@ import beatboxIMG from '@/assets/beatbox.png'
 }
 
 .nav-link.router-link-active {
-  color: white;
+  color: hsla(160, 100%, 37%, 1);
   background-color: var(--color-background-mute);
 }
 

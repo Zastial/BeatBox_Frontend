@@ -59,7 +59,7 @@ const handleSubmit = async (event: Event) => {
     const route = type.value
     const response = await axios({
       method: 'post',
-      url: `${import.meta.env.VITE_API_URL}/beat/`,
+      url: `${import.meta.env.VITE_API_URL}/music/`,
       data: formData,
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -77,10 +77,10 @@ const handleSubmit = async (event: Event) => {
       if (audioInput) audioInput.value = ''
       if (imageInput) imageInput.value = ''
 
-      router.push('/beats')
+      router.push('/')
     }
   } catch (e) {
-    error.value = 'An error occured while sending the beat'
+    error.value = "An error occured while sending the music"
     console.error(e)
   } finally {
     isLoading.value = false
@@ -93,7 +93,13 @@ const handleSubmit = async (event: Event) => {
     <form @submit="handleSubmit" class="beat-form">
       <div class="form-group">
         <label for="title">Title</label>
-        <input id="title" v-model="title" type="text" placeholder="Enter the title" required />
+        <input
+          id="title"
+          v-model="title"
+          type="text"
+          placeholder="Enter the title"
+          required
+        />
 
         <label for="artist">Artist</label>
         <input
@@ -119,11 +125,14 @@ const handleSubmit = async (event: Event) => {
         {{ error }}
       </div>
 
-      <div v-if="success" class="success-message">Beat saved with success !</div>
+      <div v-if="success" class="success-message">
+        Music added successfully !
+        <router-link to="/">Back to the list</router-link>
+      </div>
 
       <button type="submit" :disabled="isLoading">
         <span v-if="isLoading" class="loader"></span>
-        <span v-else>Add the beat</span>
+        <span v-else>Add Music</span>
       </button>
     </form>
   </div>
