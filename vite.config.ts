@@ -12,4 +12,11 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+        hmr: {
+            host: "beatbox.sunlamander.tech",
+            protocol: "wss",
+	    port: 433,
+        },
+    },
 })
